@@ -77,10 +77,15 @@ await DemoDataSeeder.SeedAsync(db);
 if (app.Environment.IsDevelopment())
 	app.MapOpenApi();
 
-app.UseForwardedHeaders(new ForwardedHeadersOptions
+ForwardedHeadersOptions forwardedHeadersOptions = new()
 {
 	ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
-});
+};
+forwardedHeadersOptions.KnownNetworks.Clear();
+forwardedHeadersOptions.KnownProxies.Clear();
+
+app.UseForwardedHeaders(forwardedHeadersOptions);
+
 app.UseHttpsRedirection();
 app.UseCors("AllowFrontend");
 app.UseRateLimiter();
