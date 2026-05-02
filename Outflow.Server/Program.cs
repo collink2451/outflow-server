@@ -79,7 +79,6 @@ var app = builder.Build();
 
 using var scope = app.Services.CreateScope();
 var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-await DatabaseSeeder.SeedAsync(db);
 await DemoDataSeeder.SeedAsync(db);
 
 if (app.Environment.IsDevelopment())
