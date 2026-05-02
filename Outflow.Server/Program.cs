@@ -17,8 +17,9 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 builder.Services.AddHostedService<DemoResetService>();
 
-builder.Services.AddDataProtection()
-	.PersistKeysToFileSystem(new DirectoryInfo("/var/www/outflow/keys"));
+if (builder.Environment.IsProduction())
+	builder.Services.AddDataProtection()
+		.PersistKeysToFileSystem(new DirectoryInfo("/var/www/outflow/keys"));
 
 builder.Services.AddAuthentication(options =>
 {
