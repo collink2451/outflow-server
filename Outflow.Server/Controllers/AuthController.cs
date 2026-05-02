@@ -12,8 +12,10 @@ namespace Outflow.Server.Controllers;
 
 [ApiController]
 [Route("auth")]
-public class AuthController(AppDbContext db) : ControllerBase
+public class AuthController(AppDbContext db, IConfiguration config) : ControllerBase
 {
+	private readonly string mFrontendUrl = config["FrontendUrl"]!;
+
 	[HttpGet("login")]
 	public IActionResult Login()
 	{
@@ -46,7 +48,7 @@ public class AuthController(AppDbContext db) : ControllerBase
 			await db.SaveChangesAsync();
 		}
 
-		return Redirect("http://localhost:4200/dashboard");
+		return Redirect($"{mFrontendUrl}/dashboard");
 	}
 
 	[HttpGet("demo")]
@@ -67,14 +69,14 @@ public class AuthController(AppDbContext db) : ControllerBase
 
 		await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
 
-		return Redirect("http://localhost:4200/dashboard");
+		return Redirect($"{mFrontendUrl}/dashboard");
 	}
 
 	[HttpGet("logout")]
 	public async Task<IActionResult> Logout()
 	{
 		await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-		return Redirect("http://localhost:4200");
+		return Redirect(mFrontendUrl);
 	}
 
 	[HttpGet("me")]

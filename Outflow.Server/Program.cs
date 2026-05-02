@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Outflow.Server.Data;
 using Outflow.Server.Services;
@@ -32,6 +33,7 @@ builder.Services.AddAuthentication(options =>
 {
 	options.ClientId = builder.Configuration["Authentication:Google:ClientId"]!;
 	options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"]!;
+	options.CallbackPath = "/auth/callback";
 	options.Scope.Add("email");
 	options.Scope.Add("profile");
 });
@@ -75,6 +77,10 @@ await DemoDataSeeder.SeedAsync(db);
 if (app.Environment.IsDevelopment())
 	app.MapOpenApi();
 
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+	ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+});
 app.UseHttpsRedirection();
 app.UseCors("AllowFrontend");
 app.UseRateLimiter();
