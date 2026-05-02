@@ -39,7 +39,7 @@ builder.Services.AddAuthentication(options =>
 {
 	options.ClientId = builder.Configuration["Authentication:Google:ClientId"]!;
 	options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"]!;
-	options.CallbackPath = "/auth/callback";
+	options.CallbackPath = "/auth/google-callback";
 	options.Scope.Add("email");
 	options.Scope.Add("profile");
 	options.CorrelationCookie.SameSite = SameSiteMode.None;
