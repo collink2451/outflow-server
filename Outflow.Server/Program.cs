@@ -94,4 +94,13 @@ app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers().RequireRateLimiting("api");
+
+app.MapGet("/debug/scheme", (HttpContext ctx) => new
+{
+	scheme = ctx.Request.Scheme,
+	host = ctx.Request.Host.ToString(),
+	proto = ctx.Request.Headers["X-Forwarded-Proto"].ToString(),
+	forwardedFor = ctx.Request.Headers["X-Forwarded-For"].ToString()
+});
+
 app.Run();
