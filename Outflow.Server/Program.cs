@@ -22,6 +22,8 @@ builder.Services.AddAuthentication(options =>
 })
 .AddCookie(options =>
 {
+	options.Cookie.SameSite = SameSiteMode.None;
+	options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
 	options.Events.OnRedirectToLogin = context =>
 	{
 		context.Response.StatusCode = 401;
@@ -35,6 +37,8 @@ builder.Services.AddAuthentication(options =>
 	options.CallbackPath = "/auth/callback";
 	options.Scope.Add("email");
 	options.Scope.Add("profile");
+	options.CorrelationCookie.SameSite = SameSiteMode.None;
+	options.CorrelationCookie.SecurePolicy = CookieSecurePolicy.Always;
 });
 
 builder.Services.AddRateLimiter(options =>
