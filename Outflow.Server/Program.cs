@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.DataProtection;
-using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Outflow.Server.Data;
 using Outflow.Server.Services;
@@ -75,12 +74,6 @@ builder.Services.AddCors(options =>
 	});
 });
 
-builder.Services.AddCookiePolicy(options =>
-{
-	options.MinimumSameSitePolicy = SameSiteMode.None;
-	options.Secure = CookieSecurePolicy.Always;
-});
-
 var app = builder.Build();
 
 using var scope = app.Services.CreateScope();
@@ -91,24 +84,10 @@ await DemoDataSeeder.SeedAsync(db);
 if (app.Environment.IsDevelopment())
 	app.MapOpenApi();
 
-app.UseForwardedHeaders(new ForwardedHeadersOptions
-{
-	ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
-});
-
 app.UseCors("AllowFrontend");
 app.UseRateLimiter();
-app.UseCookiePolicy();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers().RequireRateLimiting("api");
-
-app.MapGet("/debug/scheme", (HttpContext ctx) => new
-{
-	scheme = ctx.Request.Scheme,
-	host = ctx.Request.Host.ToString(),
-	proto = ctx.Request.Headers["X-Forwarded-Proto"].ToString(),
-	forwardedFor = ctx.Request.Headers["X-Forwarded-For"].ToString()
-});
 
 app.Run();
