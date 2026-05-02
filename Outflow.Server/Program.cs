@@ -35,12 +35,6 @@ builder.Services.AddAuthentication(options =>
 	options.CallbackPath = "/auth/callback";
 	options.Scope.Add("email");
 	options.Scope.Add("profile");
-	options.Events.OnRedirectToAuthorizationEndpoint = context =>
-	{
-		string redirectUri = context.RedirectUri.Replace("http://", "https://");
-		context.Response.Redirect(redirectUri);
-		return Task.CompletedTask;
-	};
 });
 
 builder.Services.AddRateLimiter(options =>
@@ -81,6 +75,12 @@ await DemoDataSeeder.SeedAsync(db);
 
 if (app.Environment.IsDevelopment())
 	app.MapOpenApi();
+
+app.Use(async (context, next) =>
+{
+	context.Request.Scheme = "https";
+	await next();
+});
 
 app.UseCors("AllowFrontend");
 app.UseRateLimiter();
