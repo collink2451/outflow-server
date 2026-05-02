@@ -1,0 +1,68 @@
+name: "Deploy"
+
+on:
+  push:
+    branches:
+      - master
+    paths-ignore:
+      - "**/*.md"
+      - "**/*.gitignore"
+      - "**/*.gitattributes"
+  workflow_dispatch:
+    branches:
+      - master
+    paths-ignore:
+      - "**/*.md"
+      - "**/*.gitignore"
+      - "**/*.gitattributes"
+
+jobs:
+  dotnet-workflow:
+    name: "Deploy .NET Application"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: "Checkout Repository"
+        uses: actions/checkout@v5
+
+      - name: "Set up .NET"
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: "Restore"
+        run: dotnet restore SpyFall.Server/SpyFall.Server.csproj --runtime linux-x64
+
+      - name: "Build"
+        run: dotnet build SpyFall.Server/SpyFall.Server.csproj --no-restore --configuration Release
+
+      - name: "Publish"
+        run: dotnet publish SpyFall.Server/SpyFall.Server.csproj --no-build --configuration Release --output ./artifacts
+
+      - name: "Install dotnet-ef"
+        run: dotnet tool install --global dotnet-ef
+
+      - name: "Create Migrations Bundle"
+        run: dotnet ef migrations bundle --project SpyFall.Server/SpyFall.Server.csproj --runtime linux-x64 --output ./artifacts/migrate
+
+      - name: "Copy Files"
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          source: "./artifacts/*"
+          target: "/var/www/spyfall/server"
+          strip_components: 1
+
+      - name: "Run Migrations and Restart Service"
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          script: |
+            /var/www/spyfall/server/migrate --connection "${{ secrets.DB_CONNECTION_STRING }}"
+            sudo systemctl restart spyfall-server
