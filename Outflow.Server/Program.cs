@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Outflow.Server.Data;
@@ -15,6 +16,9 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 builder.Services.AddHostedService<DemoResetService>();
+
+builder.Services.AddDataProtection()
+	.PersistKeysToFileSystem(new DirectoryInfo("/var/www/outflow/keys"));
 
 builder.Services.AddAuthentication(options =>
 {
