@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Outflow.Server.Data;
 using Outflow.Server.Services;
@@ -80,12 +81,9 @@ await DemoDataSeeder.SeedAsync(db);
 if (app.Environment.IsDevelopment())
 	app.MapOpenApi();
 
-// Cloudflare terminates SSL so Kestrel always sees http.
-// Force https scheme so OAuth redirect URIs and cookies are built correctly.
-app.Use(async (context, next) =>
+app.UseForwardedHeaders(new ForwardedHeadersOptions
 {
-	context.Request.Scheme = "https";
-	await next();
+	ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
 });
 
 app.UseCors("AllowFrontend");
@@ -93,5 +91,13 @@ app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers().RequireRateLimiting("api");
+
+app.MapGet("/debug/scheme", (HttpContext ctx) => new
+{
+	scheme = ctx.Request.Scheme,
+	host = ctx.Request.Host.ToString(),
+	proto = ctx.Request.Headers["X-Forwarded-Proto"].ToString(),
+	forwardedFor = ctx.Request.Headers["X-Forwarded-For"].ToString()
+});
 
 app.Run();
