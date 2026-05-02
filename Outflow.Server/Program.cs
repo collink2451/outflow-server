@@ -71,6 +71,12 @@ builder.Services.AddCors(options =>
 	});
 });
 
+builder.Services.AddCookiePolicy(options =>
+{
+	options.MinimumSameSitePolicy = SameSiteMode.None;
+	options.Secure = CookieSecurePolicy.Always;
+});
+
 var app = builder.Build();
 
 using var scope = app.Services.CreateScope();
@@ -88,6 +94,7 @@ app.UseForwardedHeaders(new ForwardedHeadersOptions
 
 app.UseCors("AllowFrontend");
 app.UseRateLimiter();
+app.UseCookiePolicy();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers().RequireRateLimiting("api");
