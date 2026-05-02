@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Outflow.Server.Data;
 using Outflow.Server.Services;
@@ -14,6 +15,13 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 builder.Services.AddHostedService<DemoResetService>();
+
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+	options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+	options.KnownNetworks.Clear();
+	options.KnownProxies.Clear();
+});
 
 builder.Services.AddAuthentication(options =>
 {
@@ -80,12 +88,7 @@ await DemoDataSeeder.SeedAsync(db);
 if (app.Environment.IsDevelopment())
 	app.MapOpenApi();
 
-app.Use(async (context, next) =>
-{
-	context.Request.Scheme = "https";
-	await next();
-});
-
+app.UseForwardedHeaders();
 app.UseCors("AllowFrontend");
 app.UseRateLimiter();
 app.UseAuthentication();
