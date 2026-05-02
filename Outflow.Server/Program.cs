@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using Outflow.Server.Data;
 using Outflow.Server.Services;
@@ -13,6 +14,27 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 builder.Services.AddHostedService<DemoResetService>();
+
+builder.Services.AddAuthentication(options =>
+{
+	options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+	options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+})
+.AddCookie(options =>
+{
+	options.Events.OnRedirectToLogin = context =>
+	{
+		context.Response.StatusCode = 401;
+		return Task.CompletedTask;
+	};
+})
+.AddGoogle(options =>
+{
+	options.ClientId = builder.Configuration["Authentication:Google:ClientId"]!;
+	options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"]!;
+	options.Scope.Add("email");
+	options.Scope.Add("profile");
+});
 
 builder.Services.AddRateLimiter(options =>
 {
@@ -56,30 +78,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseCors("AllowFrontend");
 app.UseRateLimiter();
+app.UseAuthentication();
+app.UseAuthorization();
 app.MapControllers().RequireRateLimiting("api");
-
-var summaries = new[]
-{
-	"Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
-
-app.MapGet("/weatherforecast", () =>
-{
-	var forecast = Enumerable.Range(1, 5).Select(index =>
-		new WeatherForecast
-		(
-			DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-			Random.Shared.Next(-20, 55),
-			summaries[Random.Shared.Next(summaries.Length)]
-		))
-		.ToArray();
-	return forecast;
-})
-.WithName("GetWeatherForecast");
-
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-	public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
