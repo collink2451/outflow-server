@@ -85,6 +85,15 @@ await DemoDataSeeder.SeedAsync(db);
 if (app.Environment.IsDevelopment())
 	app.MapOpenApi();
 
+if (!app.Environment.IsDevelopment())
+{
+	app.Use(async (context, next) =>
+	{
+		context.Request.Scheme = "https";
+		await next();
+	});
+}
+
 app.UseForwardedHeaders(new ForwardedHeadersOptions
 {
 	ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
