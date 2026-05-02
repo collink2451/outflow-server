@@ -4,6 +4,6 @@ public static class DatabaseSeeder
 {
 	public static async Task SeedAsync(AppDbContext db)
 	{
-		return;
+		await db.SaveChangesAsync();
 	}
 }
