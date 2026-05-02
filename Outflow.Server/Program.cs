@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Outflow.Server.Data;
+using Outflow.Server.Services;
 using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,6 +12,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
+builder.Services.AddHostedService<DemoResetService>();
 
 builder.Services.AddRateLimiter(options =>
 {
@@ -46,6 +48,7 @@ var app = builder.Build();
 using var scope = app.Services.CreateScope();
 var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 await DatabaseSeeder.SeedAsync(db);
+await DemoDataSeeder.SeedAsync(db);
 
 if (app.Environment.IsDevelopment())
 	app.MapOpenApi();
