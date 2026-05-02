@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Outflow.Server.Data;
 using Outflow.Server.Services;
@@ -77,16 +76,6 @@ await DemoDataSeeder.SeedAsync(db);
 if (app.Environment.IsDevelopment())
 	app.MapOpenApi();
 
-ForwardedHeadersOptions forwardedHeadersOptions = new()
-{
-	ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
-};
-forwardedHeadersOptions.KnownNetworks.Clear();
-forwardedHeadersOptions.KnownProxies.Clear();
-
-app.UseForwardedHeaders(forwardedHeadersOptions);
-
-app.UseHttpsRedirection();
 app.UseCors("AllowFrontend");
 app.UseRateLimiter();
 app.UseAuthentication();
