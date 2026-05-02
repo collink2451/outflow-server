@@ -31,19 +31,19 @@ jobs:
           dotnet-version: '9.0.x'
 
       - name: "Restore"
-        run: dotnet restore SpyFall.Server/SpyFall.Server.csproj --runtime linux-x64
+        run: dotnet restore Outflow.Server/Outflow.Server.csproj --runtime linux-x64
 
       - name: "Build"
-        run: dotnet build SpyFall.Server/SpyFall.Server.csproj --no-restore --configuration Release
+        run: dotnet build Outflow.Server/Outflow.Server.csproj --no-restore --configuration Release
 
       - name: "Publish"
-        run: dotnet publish SpyFall.Server/SpyFall.Server.csproj --no-build --configuration Release --output ./artifacts
+        run: dotnet publish Outflow.Server/Outflow.Server.csproj --no-build --configuration Release --output ./artifacts
 
       - name: "Install dotnet-ef"
         run: dotnet tool install --global dotnet-ef
 
       - name: "Create Migrations Bundle"
-        run: dotnet ef migrations bundle --project SpyFall.Server/SpyFall.Server.csproj --runtime linux-x64 --output ./artifacts/migrate
+        run: dotnet ef migrations bundle --project Outflow.Server/Outflow.Server.csproj --runtime linux-x64 --output ./artifacts/migrate
 
       - name: "Copy Files"
         uses: appleboy/scp-action@v0.1.7
@@ -53,7 +53,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           source: "./artifacts/*"
-          target: "/var/www/spyfall/server"
+          target: "/var/www/outflow/server"
           strip_components: 1
 
       - name: "Run Migrations and Restart Service"
@@ -64,5 +64,5 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           script: |
-            /var/www/spyfall/server/migrate --connection "${{ secrets.DB_CONNECTION_STRING }}"
-            sudo systemctl restart spyfall-server
+            /var/www/outflow/server/migrate --connection "${{ secrets.DB_CONNECTION_STRING }}"
+            sudo systemctl restart outflow-server
