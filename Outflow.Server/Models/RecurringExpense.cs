@@ -15,6 +15,7 @@ public class RecurringExpense : BaseEntity
 	public string Description { get; set; } = "";
 	public DateTime StartDate { get; set; }
 	public decimal Amount { get; set; }
+	public bool AutomaticRun { get; set; }
 }
 
 public class RecurringExpenseConfiguration : IEntityTypeConfiguration<RecurringExpense>

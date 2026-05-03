@@ -26,7 +26,8 @@ public class RecurringExpensesController(AppDbContext db) : ApiControllerBase(db
 				e.ExpenseCategory.Name,
 				e.Description,
 				e.StartDate,
-				e.Amount
+				e.Amount,
+				e.AutomaticRun
 			))
 			.ToListAsync();
 
@@ -49,7 +50,8 @@ public class RecurringExpensesController(AppDbContext db) : ApiControllerBase(db
 				re.ExpenseCategory.Name,
 				re.Description,
 				re.StartDate,
-				re.Amount
+				re.Amount,
+				re.AutomaticRun
 			))
 			.FirstOrDefaultAsync();
 
@@ -71,7 +73,8 @@ public class RecurringExpensesController(AppDbContext db) : ApiControllerBase(db
 			Description = request.Description,
 			StartDate = request.StartDate,
 			Amount = request.Amount,
-			UserId = user.UserId
+			UserId = user.UserId,
+			AutomaticRun = request.AutomaticRun
 		};
 		Db.RecurringExpenses.Add(recurringExpense);
 		await Db.SaveChangesAsync();
@@ -94,7 +97,8 @@ public class RecurringExpensesController(AppDbContext db) : ApiControllerBase(db
 			categoryName,
 			recurringExpense.Description,
 			recurringExpense.StartDate,
-			recurringExpense.Amount
+			recurringExpense.Amount,
+			recurringExpense.AutomaticRun
 		));
 	}
 
@@ -112,6 +116,7 @@ public class RecurringExpensesController(AppDbContext db) : ApiControllerBase(db
 		recurringExpense.Description = request.Description;
 		recurringExpense.StartDate = request.StartDate;
 		recurringExpense.Amount = request.Amount;
+		recurringExpense.AutomaticRun = request.AutomaticRun;
 
 		await Db.SaveChangesAsync();
 
@@ -133,7 +138,8 @@ public class RecurringExpensesController(AppDbContext db) : ApiControllerBase(db
 			categoryName,
 			recurringExpense.Description,
 			recurringExpense.StartDate,
-			recurringExpense.Amount
+			recurringExpense.Amount,
+			recurringExpense.AutomaticRun
 		));
 	}
 
