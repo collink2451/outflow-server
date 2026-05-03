@@ -94,7 +94,8 @@ public static class DemoDataSeeder
 				ExpenseCategoryId = housing.ExpenseCategoryId,
 				Description = "Rent",
 				Amount = 1650.00m,
-				StartDate = recurringStart
+				StartDate = recurringStart,
+				AutomaticRun = true
 			},
 			new RecurringExpense
 			{
@@ -121,7 +122,8 @@ public static class DemoDataSeeder
 				ExpenseCategoryId = utilities.ExpenseCategoryId,
 				Description = "Internet",
 				Amount = 59.99m,
-				StartDate = recurringStart
+				StartDate = recurringStart,
+				AutomaticRun = true
 			},
 			new RecurringExpense
 			{
@@ -130,7 +132,8 @@ public static class DemoDataSeeder
 				ExpenseCategoryId = entertainment.ExpenseCategoryId,
 				Description = "Spotify",
 				Amount = 11.99m,
-				StartDate = recurringStart
+				StartDate = recurringStart,
+				AutomaticRun = true
 			},
 			new RecurringExpense
 			{
@@ -139,7 +142,8 @@ public static class DemoDataSeeder
 				ExpenseCategoryId = entertainment.ExpenseCategoryId,
 				Description = "Netflix",
 				Amount = 15.49m,
-				StartDate = recurringStart
+				StartDate = recurringStart,
+				AutomaticRun = true
 			},
 			new RecurringExpense
 			{
@@ -166,7 +170,8 @@ public static class DemoDataSeeder
 				ExpenseCategoryId = shopping.ExpenseCategoryId,
 				Description = "Amazon Prime",
 				Amount = 139.00m,
-				StartDate = recurringStart
+				StartDate = recurringStart,
+				AutomaticRun = true
 			}
 		);
 		await db.SaveChangesAsync();
