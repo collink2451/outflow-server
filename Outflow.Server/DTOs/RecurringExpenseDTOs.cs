@@ -10,6 +10,7 @@ public record RecurringExpenseResponse(
 	string CategoryName,
 	string Description,
 	DateTime StartDate,
+	DateTime NextOccurrenceDate,
 	decimal Amount,
 	bool AutomaticRun);
 

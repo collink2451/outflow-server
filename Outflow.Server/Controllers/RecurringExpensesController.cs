@@ -17,17 +17,18 @@ public class RecurringExpensesController(AppDbContext db) : ApiControllerBase(db
 		if (user == null) return Unauthorized();
 
 		List<RecurringExpenseResponse> recurringExpenses = await Db.RecurringExpenses
-			.Where(e => e.UserId == user.UserId)
-			.Select(e => new RecurringExpenseResponse(
-				e.RecurringExpenseId,
-				e.FrequencyId,
-				e.Frequency.Name,
-				e.ExpenseCategoryId,
-				e.ExpenseCategory.Name,
-				e.Description,
-				e.StartDate,
-				e.Amount,
-				e.AutomaticRun
+			.Where(re => re.UserId == user.UserId)
+			.Select(re => new RecurringExpenseResponse(
+				re.RecurringExpenseId,
+				re.FrequencyId,
+				re.Frequency.Name,
+				re.ExpenseCategoryId,
+				re.ExpenseCategory.Name,
+				re.Description,
+				re.StartDate,
+				re.Frequency.GetNextOccurrence(re.StartDate, DateTime.UtcNow.Date),
+				re.Amount,
+				re.AutomaticRun
 			))
 			.ToListAsync();
 
@@ -50,6 +51,7 @@ public class RecurringExpensesController(AppDbContext db) : ApiControllerBase(db
 				re.ExpenseCategory.Name,
 				re.Description,
 				re.StartDate,
+				re.Frequency.GetNextOccurrence(re.StartDate, DateTime.UtcNow.Date),
 				re.Amount,
 				re.AutomaticRun
 			))
@@ -84,19 +86,19 @@ public class RecurringExpensesController(AppDbContext db) : ApiControllerBase(db
 			.Select(ec => ec.Name)
 			.FirstAsync();
 
-		string frequencyName = await Db.Frequencies
+		Frequency frequency = await Db.Frequencies
 			.Where(f => f.FrequencyId == recurringExpense.FrequencyId)
-			.Select(f => f.Name)
 			.FirstAsync();
 
 		return Ok(new RecurringExpenseResponse(
 			recurringExpense.RecurringExpenseId,
 			recurringExpense.FrequencyId,
-			frequencyName,
+			frequency.Name,
 			recurringExpense.ExpenseCategoryId,
 			categoryName,
 			recurringExpense.Description,
 			recurringExpense.StartDate,
+			frequency.GetNextOccurrence(recurringExpense.StartDate, DateTime.UtcNow.Date),
 			recurringExpense.Amount,
 			recurringExpense.AutomaticRun
 		));
@@ -125,19 +127,19 @@ public class RecurringExpensesController(AppDbContext db) : ApiControllerBase(db
 			.Select(ec => ec.Name)
 			.FirstAsync();
 
-		string frequencyName = await Db.Frequencies
+		Frequency frequency = await Db.Frequencies
 			.Where(f => f.FrequencyId == recurringExpense.FrequencyId)
-			.Select(f => f.Name)
 			.FirstAsync();
 
 		return Ok(new RecurringExpenseResponse(
 			recurringExpense.RecurringExpenseId,
 			recurringExpense.FrequencyId,
-			frequencyName,
+			frequency.Name,
 			recurringExpense.ExpenseCategoryId,
 			categoryName,
 			recurringExpense.Description,
 			recurringExpense.StartDate,
+			frequency.GetNextOccurrence(recurringExpense.StartDate, DateTime.UtcNow.Date),
 			recurringExpense.Amount,
 			recurringExpense.AutomaticRun
 		));
