@@ -48,10 +48,10 @@ public static class DemoDataSeeder
 		// -------------------------
 		// Frequencies
 		// -------------------------
-		Frequency biWeekly = db.Frequencies.First(f => f.Name == "BiWeekly");
+		Frequency biWeekly = db.Frequencies.First(f => f.Name == "Bi-Weekly");
 		Frequency monthly = db.Frequencies.First(f => f.Name == "Monthly");
-		Frequency biYearly = db.Frequencies.First(f => f.Name == "BiYearly");
-		Frequency yearly = db.Frequencies.First(f => f.Name == "Yearly");
+		Frequency semiAnnually = db.Frequencies.First(f => f.Name == "Semi-Annually");
+		Frequency annually = db.Frequencies.First(f => f.Name == "Annually");
 
 		// -------------------------
 		// Pay Schedule
@@ -153,7 +153,7 @@ public static class DemoDataSeeder
 			new RecurringExpense
 			{
 				UserId = userId,
-				FrequencyId = biYearly.FrequencyId,
+				FrequencyId = semiAnnually.FrequencyId,
 				ExpenseCategoryId = transport.ExpenseCategoryId,
 				Description = "Car Insurance",
 				Amount = 700.00m,
@@ -162,7 +162,7 @@ public static class DemoDataSeeder
 			new RecurringExpense
 			{
 				UserId = userId,
-				FrequencyId = yearly.FrequencyId,
+				FrequencyId = annually.FrequencyId,
 				ExpenseCategoryId = shopping.ExpenseCategoryId,
 				Description = "Amazon Prime",
 				Amount = 139.00m,

@@ -48,7 +48,7 @@ public class FrequencyConfiguration : IEntityTypeConfiguration<Frequency>
 			new Frequency { FrequencyId = 2, Name = "Bi-Weekly", DaysInterval = 14, MonthsInterval = null, CreatedAt = seedDate, UpdatedAt = seedDate },
 			new Frequency { FrequencyId = 3, Name = "Monthly", DaysInterval = null, MonthsInterval = 1, CreatedAt = seedDate, UpdatedAt = seedDate },
 			new Frequency { FrequencyId = 4, Name = "Semi-Annually", DaysInterval = null, MonthsInterval = 6, CreatedAt = seedDate, UpdatedAt = seedDate },
-			new Frequency { FrequencyId = 5, Name = "Anually", DaysInterval = null, MonthsInterval = 12, CreatedAt = seedDate, UpdatedAt = seedDate }
+			new Frequency { FrequencyId = 5, Name = "Annually", DaysInterval = null, MonthsInterval = 12, CreatedAt = seedDate, UpdatedAt = seedDate }
 		);
 	}
 }
