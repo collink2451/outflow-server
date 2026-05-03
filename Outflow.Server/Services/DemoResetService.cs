@@ -21,7 +21,7 @@ public class DemoResetService(IServiceScopeFactory scopeFactory, ILogger<DemoRes
 			}
 			catch (Exception ex)
 			{
-				logger.LogError(ex, "Error during game cleanup");
+				logger.LogError(ex, "Error during demo reset");
 			}
 		}
 	}
