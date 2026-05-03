@@ -31,9 +31,16 @@ builder.Services.AddAuthentication(options =>
 {
 	options.Cookie.SameSite = SameSiteMode.None;
 	options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+	options.ExpireTimeSpan = TimeSpan.FromDays(30);
+	options.SlidingExpiration = true;
 	options.Events.OnRedirectToLogin = context =>
 	{
 		context.Response.StatusCode = 401;
+		return Task.CompletedTask;
+	};
+	options.Events.OnSigningIn = context =>
+	{
+		context.Properties.IsPersistent = true;
 		return Task.CompletedTask;
 	};
 })
