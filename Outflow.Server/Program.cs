@@ -16,6 +16,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 builder.Services.AddHostedService<DemoResetService>();
+builder.Services.AddHostedService<RecurringExpenseService>();
 
 if (builder.Environment.IsProduction())
 	builder.Services.AddDataProtection()

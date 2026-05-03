@@ -13,6 +13,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 	public DbSet<PayCheck> PayChecks { get; set; }
 	public DbSet<PaySchedule> PaySchedules { get; set; }
 	public DbSet<RecurringExpense> RecurringExpenses { get; set; }
+	public DbSet<ServiceTimestamp> ServiceTimestamps { get; set; }
 
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{
