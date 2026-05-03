@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace Outflow.Server.DTOs;
 
 public record RecurringExpenseResponse(
@@ -14,7 +16,7 @@ public record RecurringExpenseResponse(
 public record CreateRecurringExpenseRequest(
 	int FrequencyId,
 	int ExpenseCategoryId,
-	string Description,
+	[Required, StringLength(64, MinimumLength = 1)] string Description,
 	DateTime StartDate,
 	decimal Amount,
 	bool AutomaticRun);
@@ -22,7 +24,7 @@ public record CreateRecurringExpenseRequest(
 public record UpdateRecurringExpenseRequest(
 	int FrequencyId,
 	int ExpenseCategoryId,
-	string Description,
+	[Required, StringLength(64, MinimumLength = 1)] string Description,
 	DateTime StartDate,
 	decimal Amount,
 	bool AutomaticRun);
