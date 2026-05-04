@@ -92,6 +92,19 @@ await DemoDataSeeder.SeedAsync(db);
 
 if (app.Environment.IsDevelopment())
 	app.MapOpenApi();
+else
+	app.UseExceptionHandler(appBuilder =>
+		appBuilder.Run(async context =>
+		{
+			var logger = context.RequestServices.GetRequiredService<ILogger<Program>>();
+			var feature = context.Features.Get<Microsoft.AspNetCore.Diagnostics.IExceptionHandlerFeature>();
+			if (feature?.Error is { } ex)
+				logger.LogError(ex, "Unhandled exception at {Path}", context.Request.Path);
+
+			context.Response.StatusCode = 500;
+			context.Response.ContentType = "application/json";
+			await context.Response.WriteAsJsonAsync(new { error = "An unexpected error occurred." });
+		}));
 
 if (!app.Environment.IsDevelopment())
 {
