@@ -12,15 +12,15 @@ public record PayScheduleResponse(
 	DateTime? EndDate);
 
 public record CreatePayScheduleRequest(
-	int FrequencyId,
-	decimal Amount,
+	[Required] int FrequencyId,
+	[Required] decimal Amount,
 	[Required, StringLength(64, MinimumLength = 1)] string Description,
-	DateTime StartDate,
+	[Required] DateTime StartDate,
 	DateTime? EndDate);
 
 public record UpdatePayScheduleRequest(
-	int FrequencyId,
-	decimal Amount,
+	[Required] int FrequencyId,
+	[Required] decimal Amount,
 	[Required, StringLength(64, MinimumLength = 1)] string Description,
-	DateTime StartDate,
+	[Required] DateTime StartDate,
 	DateTime? EndDate);

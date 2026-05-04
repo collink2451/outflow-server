@@ -15,17 +15,17 @@ public record RecurringExpenseResponse(
 	bool AutomaticRun);
 
 public record CreateRecurringExpenseRequest(
-	int FrequencyId,
-	int ExpenseCategoryId,
+	[Required] int FrequencyId,
+	[Required] int ExpenseCategoryId,
 	[Required, StringLength(64, MinimumLength = 1)] string Description,
-	DateTime StartDate,
-	decimal Amount,
-	bool AutomaticRun);
+	[Required] DateTime StartDate,
+	[Required] decimal Amount,
+	[Required] bool AutomaticRun);
 
 public record UpdateRecurringExpenseRequest(
-	int FrequencyId,
-	int ExpenseCategoryId,
+	[Required] int FrequencyId,
+	[Required] int ExpenseCategoryId,
 	[Required, StringLength(64, MinimumLength = 1)] string Description,
-	DateTime StartDate,
-	decimal Amount,
-	bool AutomaticRun);
+	[Required] DateTime StartDate,
+	[Required] decimal Amount,
+	[Required] bool AutomaticRun);

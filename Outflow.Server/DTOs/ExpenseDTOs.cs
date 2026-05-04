@@ -11,13 +11,13 @@ public record ExpenseResponse(
 	decimal Amount);
 
 public record CreateExpenseRequest(
-	int ExpenseCategoryId,
+	[Required] int ExpenseCategoryId,
 	[Required, StringLength(64, MinimumLength = 1)] string Description,
-	DateTime Date,
-	decimal Amount);
+	[Required] DateTime Date,
+	[Required] decimal Amount);
 
 public record UpdateExpenseRequest(
-	int ExpenseCategoryId,
+	[Required] int ExpenseCategoryId,
 	[Required, StringLength(64, MinimumLength = 1)] string Description,
-	DateTime Date,
-	decimal Amount);
+	[Required] DateTime Date,
+	[Required] decimal Amount);
