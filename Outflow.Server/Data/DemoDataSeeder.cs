@@ -58,6 +58,7 @@ public static class DemoDataSeeder
 		// -------------------------
 		PaySchedule paySchedule = new()
 		{
+			Description = "Biweekly Pay Schedule",
 			UserId = userId,
 			FrequencyId = biWeekly.FrequencyId,
 			Amount = 4200.00m,
