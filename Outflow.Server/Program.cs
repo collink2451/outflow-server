@@ -9,6 +9,7 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 builder.Services.AddHostedService<DemoResetService>();
 builder.Services.AddHostedService<RecurringExpenseService>();
+builder.Services.AddHostedService<PayCheckGeneratorService>();
 builder.Services.AddAppAuthentication(builder.Configuration);
 builder.Services.AddAppRateLimiting();
 builder.Services.AddAppCors();
