@@ -10,12 +10,12 @@ using System.Security.Claims;
 
 namespace Outflow.Server.Controllers;
 
-[ApiController]
 [Route("auth")]
-public class AuthController(AppDbContext db, IConfiguration config) : ControllerBase
+public class AuthController(AppDbContext db, IConfiguration config) : ApiControllerBase(db)
 {
 	private readonly string mFrontendUrl = config["FrontendUrl"]!;
 
+	[AllowAnonymous]
 	[HttpGet("login")]
 	public IActionResult Login()
 	{
@@ -25,6 +25,7 @@ public class AuthController(AppDbContext db, IConfiguration config) : Controller
 		}, GoogleDefaults.AuthenticationScheme);
 	}
 
+	[AllowAnonymous]
 	[HttpGet("callback")]
 	public async Task<IActionResult> Callback()
 	{
@@ -40,21 +41,22 @@ public class AuthController(AppDbContext db, IConfiguration config) : Controller
 		if (googleId == null)
 			return Unauthorized();
 
-		User? user = await db.Users.FirstOrDefaultAsync(u => u.GoogleId == googleId);
+		User? user = await Db.Users.FirstOrDefaultAsync(u => u.GoogleId == googleId);
 		if (user == null)
 		{
-			user = new User { GoogleId = googleId, Email = email!, Name = name! };
-			db.Users.Add(user);
-			await db.SaveChangesAsync();
+			user = new User { GoogleId = googleId, Email = email ?? string.Empty, Name = name ?? string.Empty };
+			Db.Users.Add(user);
+			await Db.SaveChangesAsync();
 		}
 
 		return Redirect($"{mFrontendUrl}/dashboard");
 	}
 
+	[AllowAnonymous]
 	[HttpGet("demo")]
 	public async Task<IActionResult> DemoLogin()
 	{
-		User? user = await db.Users.FirstOrDefaultAsync(u => u.GoogleId == "demo");
+		User? user = await Db.Users.FirstOrDefaultAsync(u => u.GoogleId == "demo");
 		if (user == null) return NotFound();
 
 		List<Claim> claims =
@@ -72,6 +74,7 @@ public class AuthController(AppDbContext db, IConfiguration config) : Controller
 		return Redirect($"{mFrontendUrl}/dashboard");
 	}
 
+	[AllowAnonymous]
 	[HttpGet("logout")]
 	public async Task<IActionResult> Logout()
 	{
@@ -79,12 +82,11 @@ public class AuthController(AppDbContext db, IConfiguration config) : Controller
 		return Redirect(mFrontendUrl);
 	}
 
-	[HttpGet("me")]
 	[Authorize]
+	[HttpGet("me")]
 	public async Task<IActionResult> Me()
 	{
-		string? googleId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-		User? user = await db.Users.FirstOrDefaultAsync(u => u.GoogleId == googleId);
+		User? user = await GetCurrentUserAsync();
 		if (user == null) return Unauthorized();
 		return Ok(new { user.UserId, user.Name, user.Email });
 	}
