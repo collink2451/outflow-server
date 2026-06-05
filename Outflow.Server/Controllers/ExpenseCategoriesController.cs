@@ -18,6 +18,7 @@ public class ExpenseCategoriesController(AppDbContext db) : ApiControllerBase(db
 
 		List<ExpenseCategoryResponse> categories = await Db.ExpenseCategories
 			.Where(ec => ec.UserId == user.UserId)
+			.OrderBy(ec => ec.Name)
 			.Select(ec => new ExpenseCategoryResponse(ec.ExpenseCategoryId, ec.Name))
 			.ToListAsync();
 
