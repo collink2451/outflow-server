@@ -111,6 +111,8 @@ public class PlaidController(AppDbContext db, PlaidClient _plaidClient) : ApiCon
 				{
 					if (added.TransactionId == null || stagedIds.Contains(added.TransactionId)) continue;
 
+					stagedIds.Add(added.TransactionId);
+
 					string merchantName = added.MerchantName ?? "";
 
 					Vendor? vendor = vendors.FirstOrDefault(v =>
@@ -142,7 +144,6 @@ public class PlaidController(AppDbContext db, PlaidClient _plaidClient) : ApiCon
 							Date = added.Date?.ToDateTime(TimeOnly.MinValue) ?? DateTime.UtcNow,
 							Amount = added.Amount ?? 0
 						});
-						stagedIds.Add(added.TransactionId);
 					}
 				}
 
