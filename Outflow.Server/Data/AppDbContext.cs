@@ -15,6 +15,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 	public DbSet<RecurringExpense> RecurringExpenses { get; set; }
 	public DbSet<ServiceTimestamp> ServiceTimestamps { get; set; }
 	public DbSet<PlaidConnection> PlaidConnections { get; set; }
+	public DbSet<PlaidTransaction> PlaidTransactions { get; set; }
+	public DbSet<Vendor> Vendors { get; set; }
 
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{

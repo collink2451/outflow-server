@@ -11,3 +11,15 @@ public record PlaidConnectionResponse(
 	int PlaidConnectionId,
 	string InstitutionName,
 	string InstitutionId);
+
+public record PlaidTransactionResponse(
+	string PlaidTransactionId,
+	int PlaidConnectionId,
+	string InstitutionName,
+	string Name,
+	DateTime Date,
+	decimal Amount);
+
+public record ApproveTransactionRequest(
+	[Required] int ExpenseCategoryId,
+	string? Description);

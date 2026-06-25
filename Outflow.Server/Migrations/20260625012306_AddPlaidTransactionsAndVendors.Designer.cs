@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Outflow.Server.Data;
 
@@ -11,9 +12,11 @@ using Outflow.Server.Data;
 namespace Outflow.Server.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260625012306_AddPlaidTransactionsAndVendors")]
+    partial class AddPlaidTransactionsAndVendors
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -413,13 +416,10 @@ namespace Outflow.Server.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("VendorId"));
 
-                    b.Property<bool>("AutoDismiss")
-                        .HasColumnType("tinyint(1)");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<int?>("ExpenseCategoryId")
+                    b.Property<int>("ExpenseCategoryId")
                         .HasColumnType("int");
 
                     b.Property<string>("MatchPattern")
@@ -521,7 +521,7 @@ namespace Outflow.Server.Migrations
                     b.HasOne("Outflow.Server.Models.PlaidConnection", "PlaidConnection")
                         .WithMany()
                         .HasForeignKey("PlaidConnectionId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Outflow.Server.Models.User", "User")
@@ -567,7 +567,8 @@ namespace Outflow.Server.Migrations
                     b.HasOne("Outflow.Server.Models.ExpenseCategory", "ExpenseCategory")
                         .WithMany()
                         .HasForeignKey("ExpenseCategoryId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.HasOne("Outflow.Server.Models.User", "User")
                         .WithMany()

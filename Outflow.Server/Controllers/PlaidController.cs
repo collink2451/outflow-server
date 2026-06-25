@@ -86,6 +86,16 @@ public class PlaidController(AppDbContext db, PlaidClient _plaidClient) : ApiCon
 			.Where(c => c.UserId == user.UserId)
 			.ToListAsync();
 
+		List<Vendor> vendors = await Db.Vendors
+			.Where(v => v.UserId == user.UserId)
+			.ToListAsync();
+
+		HashSet<string> stagedIds = (await Db.PlaidTransactions
+			.Where(pt => pt.UserId == user.UserId)
+			.Select(pt => pt.PlaidTransactionId)
+			.ToListAsync())
+			.ToHashSet();
+
 		foreach (PlaidConnection connection in connections)
 		{
 			bool hasMore = true;
@@ -97,14 +107,130 @@ public class PlaidController(AppDbContext db, PlaidClient _plaidClient) : ApiCon
 					Cursor = connection.Cursor
 				});
 
-				// TODO handle responses here
+				foreach (Transaction added in response.Added)
+				{
+					if (added.TransactionId == null || stagedIds.Contains(added.TransactionId)) continue;
+
+					string merchantName = added.MerchantName ?? "";
+
+					Vendor? vendor = vendors.FirstOrDefault(v =>
+						merchantName.Contains(v.MatchPattern, StringComparison.OrdinalIgnoreCase));
+
+					if (vendor != null && vendor.AutoDismiss)
+					{
+						// intentionally skipped
+					}
+					else if (vendor != null && vendor.ExpenseCategoryId != null)
+					{
+						Db.Expenses.Add(new Expense
+						{
+							UserId = user.UserId,
+							ExpenseCategoryId = vendor.ExpenseCategoryId.Value,
+							Description = vendor.Name,
+							Date = added.Date?.ToDateTime(TimeOnly.MinValue) ?? DateTime.UtcNow,
+							Amount = added.Amount ?? 0
+						});
+					}
+					else
+					{
+						Db.PlaidTransactions.Add(new PlaidTransaction
+						{
+							PlaidTransactionId = added.TransactionId,
+							UserId = user.UserId,
+							PlaidConnectionId = connection.PlaidConnectionId,
+							Name = merchantName,
+							Date = added.Date?.ToDateTime(TimeOnly.MinValue) ?? DateTime.UtcNow,
+							Amount = added.Amount ?? 0
+						});
+						stagedIds.Add(added.TransactionId);
+					}
+				}
+
+				foreach (Transaction modified in response.Modified)
+				{
+					PlaidTransaction? staged = await Db.PlaidTransactions.FindAsync(modified.TransactionId);
+					if (staged == null) continue;
+
+					staged.Name = modified.MerchantName ?? staged.Name;
+					staged.Date = modified.Date?.ToDateTime(TimeOnly.MinValue) ?? staged.Date;
+					staged.Amount = modified.Amount ?? staged.Amount;
+				}
+
+				foreach (RemovedTransaction removed in response.Removed)
+				{
+					PlaidTransaction? staged = await Db.PlaidTransactions.FindAsync(removed.TransactionId);
+					if (staged != null) Db.PlaidTransactions.Remove(staged);
+				}
 
 				connection.Cursor = response.NextCursor;
 				hasMore = response.HasMore;
 			}
 		}
 
+		await Db.SaveChangesAsync();
 		return Ok();
+	}
+
+	[HttpGet("staged")]
+	public async Task<IActionResult> GetStaged()
+	{
+		User? user = await GetCurrentUserAsync();
+		if (user == null) return Unauthorized();
+		if (user.GoogleId == "demo") return Forbid();
+
+		List<PlaidTransactionResponse> transactions = await Db.PlaidTransactions
+			.Where(pt => pt.UserId == user.UserId)
+			.Select(pt => new PlaidTransactionResponse(
+				pt.PlaidTransactionId,
+				pt.PlaidConnectionId,
+				pt.PlaidConnection.InstitutionName,
+				pt.Name,
+				pt.Date,
+				pt.Amount))
+			.ToListAsync();
+
+		return Ok(transactions);
+	}
+
+	[HttpPost("staged/{plaidTransactionId}/approve")]
+	public async Task<IActionResult> PostApproveTransaction(string plaidTransactionId, ApproveTransactionRequest request)
+	{
+		User? user = await GetCurrentUserAsync();
+		if (user == null) return Unauthorized();
+		if (user.GoogleId == "demo") return Forbid();
+
+		PlaidTransaction? transaction = await Db.PlaidTransactions.FindAsync(plaidTransactionId);
+		if (transaction == null || transaction.UserId != user.UserId) return NotFound();
+
+		Db.Expenses.Add(new Expense
+		{
+			UserId = user.UserId,
+			ExpenseCategoryId = request.ExpenseCategoryId,
+			Description = request.Description ?? transaction.Name,
+			Date = transaction.Date,
+			Amount = transaction.Amount
+		});
+
+		Db.PlaidTransactions.Remove(transaction);
+		await Db.SaveChangesAsync();
+
+		return Ok();
+	}
+
+	[HttpDelete("staged/{plaidTransactionId}")]
+	public async Task<IActionResult> DeleteStagedTransaction(string plaidTransactionId)
+	{
+		User? user = await GetCurrentUserAsync();
+		if (user == null) return Unauthorized();
+		if (user.GoogleId == "demo") return Forbid();
+
+		PlaidTransaction? transaction = await Db.PlaidTransactions.FindAsync(plaidTransactionId);
+		if (transaction == null || transaction.UserId != user.UserId) return NotFound();
+
+		Db.PlaidTransactions.Remove(transaction);
+		await Db.SaveChangesAsync();
+
+		return NoContent();
 	}
 
 	[HttpDelete("connections/{connectionId}")]
