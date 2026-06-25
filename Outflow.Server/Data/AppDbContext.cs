@@ -14,6 +14,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 	public DbSet<PaySchedule> PaySchedules { get; set; }
 	public DbSet<RecurringExpense> RecurringExpenses { get; set; }
 	public DbSet<ServiceTimestamp> ServiceTimestamps { get; set; }
+	public DbSet<PlaidConnection> PlaidConnections { get; set; }
 
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{

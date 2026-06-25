@@ -1,3 +1,4 @@
+using Going.Plaid;
 using Outflow.Server.Data;
 using Outflow.Server.Extensions;
 using Outflow.Server.Services;
@@ -13,6 +14,7 @@ builder.Services.AddHostedService<PayCheckGeneratorService>();
 builder.Services.AddAppAuthentication(builder.Configuration);
 builder.Services.AddAppRateLimiting();
 builder.Services.AddAppCors();
+builder.Services.AddPlaid(builder.Configuration.GetSection("Plaid"));
 
 if (builder.Environment.IsProduction()) builder.Services.AddAppDataProtection();
 
