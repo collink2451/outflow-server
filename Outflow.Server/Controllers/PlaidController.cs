@@ -90,11 +90,10 @@ public class PlaidController(AppDbContext db, PlaidClient _plaidClient) : ApiCon
 			.Where(v => v.UserId == user.UserId)
 			.ToListAsync();
 
-		HashSet<string> stagedIds = (await Db.PlaidTransactions
+		HashSet<string> stagedIds = [.. (await Db.PlaidTransactions
 			.Where(pt => pt.UserId == user.UserId)
 			.Select(pt => pt.PlaidTransactionId)
-			.ToListAsync())
-			.ToHashSet();
+			.ToListAsync())];
 
 		foreach (PlaidConnection connection in connections)
 		{
