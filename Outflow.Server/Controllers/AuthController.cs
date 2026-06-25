@@ -43,11 +43,7 @@ public class AuthController(AppDbContext db, IConfiguration config) : ApiControl
 
 		User? user = await Db.Users.FirstOrDefaultAsync(u => u.GoogleId == googleId);
 		if (user == null)
-		{
-			user = new User { GoogleId = googleId, Email = email ?? string.Empty, Name = name ?? string.Empty };
-			Db.Users.Add(user);
-			await Db.SaveChangesAsync();
-		}
+			return Redirect($"{mFrontendUrl}?error=signup_disabled");
 
 		return Redirect($"{mFrontendUrl}/dashboard");
 	}
