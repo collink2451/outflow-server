@@ -180,6 +180,7 @@ public class PlaidController(AppDbContext db, PlaidClient _plaidClient) : ApiCon
 
 		List<PlaidTransactionResponse> transactions = await Db.PlaidTransactions
 			.Where(pt => pt.UserId == user.UserId)
+			.OrderBy(pt => pt.Date)
 			.Select(pt => new PlaidTransactionResponse(
 				pt.PlaidTransactionId,
 				pt.PlaidConnectionId,
