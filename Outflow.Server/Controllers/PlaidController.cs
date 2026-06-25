@@ -103,7 +103,8 @@ public class PlaidController(AppDbContext db, PlaidClient _plaidClient) : ApiCon
 				TransactionsSyncResponse response = await _plaidClient.TransactionsSyncAsync(new TransactionsSyncRequest
 				{
 					AccessToken = connection.AccessToken,
-					Cursor = connection.Cursor
+					Cursor = connection.Cursor,
+					Options = new TransactionsSyncRequestOptions { IncludeOriginalDescription = true }
 				});
 
 				foreach (Transaction added in response.Added)
@@ -112,7 +113,7 @@ public class PlaidController(AppDbContext db, PlaidClient _plaidClient) : ApiCon
 
 					stagedIds.Add(added.TransactionId);
 
-					string merchantName = added.MerchantName ?? "";
+					string merchantName = added.MerchantName ?? added.OriginalDescription ?? "";
 
 					Vendor? vendor = vendors.FirstOrDefault(v =>
 						merchantName.Contains(v.MatchPattern, StringComparison.OrdinalIgnoreCase));
